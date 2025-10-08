@@ -69,7 +69,6 @@ export const loadAllData = async () => {
           //   chunk_content: ${chunk}
           //   embeddings: ${embedding}
           //   `);
-
           await KnowledgeBase.create({
             source,
             source_id: source, // Or a more specific ID if available
