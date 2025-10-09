@@ -58,12 +58,42 @@ KnowledgeBase.init(
       allowNull: false,
     },
     embeddings_768: {
-      type: DataTypes.ARRAY(DataTypes.REAL),
+      type: 'VECTOR(768)',
       allowNull: true,
+      set(value: number[] | null) {
+        if (value) {
+          // Convert array to pgvector format string
+          this.setDataValue('embeddings_768' as any, `[${value.join(',')}]`);
+        } else {
+          this.setDataValue('embeddings_768' as any, null);
+        }
+      },
+      get() {
+        const raw = this.getDataValue('embeddings_768' as any);
+        if (!raw) return null;
+        // Parse pgvector format string back to array
+        const str = raw.toString();
+        return str.slice(1, -1).split(',').map(Number);
+      }
     },
     embeddings_1536: {
-      type: DataTypes.ARRAY(DataTypes.REAL),
+      type: 'VECTOR(1536)',
       allowNull: true,
+      set(value: number[] | null) {
+        if (value) {
+          // Convert array to pgvector format string
+          this.setDataValue('embeddings_1536' as any, `[${value.join(',')}]`);
+        } else {
+          this.setDataValue('embeddings_1536' as any, null);
+        }
+      },
+      get() {
+        const raw = this.getDataValue('embeddings_1536' as any);
+        if (!raw) return null;
+        // Parse pgvector format string back to array
+        const str = raw.toString();
+        return str.slice(1, -1).split(',').map(Number);
+      }
     },
     created_at: {
       type: DataTypes.DATE,
