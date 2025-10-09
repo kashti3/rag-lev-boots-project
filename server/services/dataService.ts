@@ -3,6 +3,9 @@ import { fetchSlackMessages } from '../utils/slackFetcher';
 import { fetchWebArticles } from '../utils/webArticleFetcher';
 import { createEmbedding } from './llmService';
 import KnowledgeBase from '../models/KnowledgeBase';
+import { QueryTypes } from 'sequelize';
+import sequelize from '../config/database';
+import { RAG_CONFIG } from '../config/constants';
 
 const WORDS_PER_CHUNK = 400;
 
@@ -85,4 +88,40 @@ export const loadAllData = async () => {
   } catch (error) {
     console.error('Error loading data:', error);
   }
+};
+
+export interface SimilarChunk {
+  source: string;
+  chunk_content: string;
+  distance: number;
+}
+
+export const findSimilarChunks = async (embedding: number[]): Promise<SimilarChunk[]> => {
+  console.log('Searching for similar content in knowledge base...');
+  
+  const similarChunks = await sequelize.query(
+    `SELECT 
+      source,
+      chunk_content,
+      embeddings_768 <=> CAST(:embedding AS vector) AS distance
+    FROM knowledge_base
+    WHERE embeddings_768 IS NOT NULL
+    ORDER BY distance
+    LIMIT :limit`,
+    {
+      replacements: {
+        embedding: `[${embedding.join(',')}]`,
+        limit: RAG_CONFIG.topK
+      },
+      type: QueryTypes.SELECT
+    }
+  ) as SimilarChunk[];
+
+  return similarChunks;
+};
+
+export const formatChunksAsContext = (chunks: SimilarChunk[]): string => {
+  return chunks
+    .map((chunk, index) => `[Source ${index + 1}: ${chunk.source}]\n${chunk.chunk_content}`)
+    .join('\n\n---\n\n');
 };
