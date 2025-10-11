@@ -104,20 +104,13 @@ export const fetchSlackMessages = async (): Promise<SlackData[]> => {
         continue;
       }
 
-      // Group messages into chunks for better context
-      const chunkSize = 10; // Group 10 messages together
-      for (let i = 0; i < messages.length; i += chunkSize) {
-        const chunk = messages.slice(i, Math.min(i + chunkSize, messages.length));
-        
-        const content = chunk
-          .map(msg => `[${new Date(msg.timestamp).toISOString()}] ${msg.user}: ${msg.text}`)
-          .join('\n\n');
-
-        formattedData.push({
-          source: `slack-${channel}`,
-          content: `Channel: ${channel}\n\n${content}`
-        });
-      }
+      // Return all messages as JSON for the gatekeeper to process with hybrid approach
+      formattedData.push({
+        source: `slack-${channel}`,
+        content: JSON.stringify(messages)
+      });
+      
+      console.log(`Fetched ${messages.length} messages from ${channel}`);
       
       // Rate limiting delay between channels
       if (CHANNELS.indexOf(channel) < CHANNELS.length - 1) {
@@ -128,6 +121,6 @@ export const fetchSlackMessages = async (): Promise<SlackData[]> => {
     }
   }
 
-  console.log(`Total Slack data chunks created: ${formattedData.length}`);
+  console.log(`Total Slack channels fetched: ${formattedData.length}`);
   return formattedData;
 };

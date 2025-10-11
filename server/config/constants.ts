@@ -27,3 +27,24 @@ Instructions:
   // Error message
   errorMessage: "Failed to process the question. Please try again."
 };
+
+export const GATEKEEPER_CONFIG = {
+  // Filtering thresholds per source type (0-10 scale)
+  thresholds: {
+    pdf: 3,
+    slack: 7,
+    'web-article': 5
+  },
+  
+  // Slack message grouping configuration
+  slack: {
+    timeWindowMs: 5 * 60 * 1000, // 5 minutes
+    minThreadSize: 2 // Minimum messages to consider as thread
+  },
+  
+  // Model to use for gatekeeper decisions
+  model: 'gemini-1.5-flash', // Using flash for faster, cheaper filtering
+  
+  // Enable detailed logging
+  enableRejectionLogging: true
+};
