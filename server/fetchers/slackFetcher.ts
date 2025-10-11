@@ -5,15 +5,21 @@ interface SlackData {
 }
 
 interface SlackMessage {
+  id: string;
+  channel: string;
   user: string;
+  role: string;
+  ts: string;
   text: string;
-  timestamp: string;
+  thread_ts: string;
 }
 
 interface SlackResponse {
-  messages: SlackMessage[];
-  has_more: boolean;
-  next_page?: number;
+  channel: string;
+  page: number;
+  limit: number;
+  total: number;
+  items: SlackMessage[];
 }
 
 const SLACK_API_BASE = 'https://lev-boots-slack-api.jona-581.workers.dev';
@@ -53,11 +59,11 @@ async function fetchWithRetry(url: string, retries = MAX_RETRIES): Promise<Respo
 async function fetchChannelMessages(channel: string): Promise<SlackMessage[]> {
   const allMessages: SlackMessage[] = [];
   let page = 1;
-  let hasMore = true;
+  let totalPages = 1;
 
   console.log(`Fetching messages from Slack channel: ${channel}`);
 
-  while (hasMore) {
+  while (page <= totalPages) {
     const url = `${SLACK_API_BASE}/?channel=${channel}&page=${page}`;
     console.log(`Fetching page ${page} from ${channel}...`);
 
@@ -65,25 +71,26 @@ async function fetchChannelMessages(channel: string): Promise<SlackMessage[]> {
       const response = await fetchWithRetry(url);
       const data: SlackResponse = await response.json();
 
-      if (data.messages && data.messages.length > 0) {
-        allMessages.push(...data.messages);
-        console.log(`Fetched ${data.messages.length} messages from ${channel} page ${page}`);
+      if (data.items && data.items.length > 0) {
+        allMessages.push(...data.items);
+        console.log(`Fetched ${data.items.length} messages from ${channel} page ${page}`);
       }
 
-      hasMore = data.has_more;
-      if (hasMore && data.next_page) {
-        page = data.next_page;
-      } else {
-        page++;
+      // Calculate total pages based on total messages and limit
+      if (page === 1) {
+        totalPages = Math.ceil(data.total / data.limit);
+        console.log(`Total pages to fetch: ${totalPages} (${data.total} messages total)`);
       }
+
+      page++;
 
       // Rate limiting delay between requests
-      if (hasMore) {
+      if (page <= totalPages) {
         await sleep(RATE_LIMIT_DELAY);
       }
     } catch (error) {
       console.error(`Error fetching ${channel} page ${page}:`, error);
-      hasMore = false;
+      break; // Exit loop on error
     }
   }
 
