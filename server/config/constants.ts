@@ -43,7 +43,7 @@ export const GATEKEEPER_CONFIG = {
   },
   
   // Model to use for gatekeeper decisions
-  model: 'gemini-1.5-flash', // Using flash for faster, cheaper filtering
+  model: 'gemini-2.5-flash', // Using flash for faster, cheaper filtering
   
   // Enable detailed logging
   enableRejectionLogging: true
