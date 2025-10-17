@@ -1,6 +1,7 @@
+import { ask } from '../../services/ragService';
 
-export const ragSearchTool: async (input) => {
-  
+export const ragSearchTool = async (input: string) => {
+  return await ask(input);
 };
 
 
