@@ -1,9 +1,40 @@
+export const GEMINI_MODEL = 'gemini-2.5-flash';
+
 export const LLM_CONFIG = {
-  thinkingBudget: 10000,
+  thinkingBudget: 0,
   model: 'gemini-1.5-pro',
   embeddingModel: 'gemini-embedding-001',
   embeddingDimensions: 768
 };
+
+export const DATA_SOURCES = {
+  ARTICLE: 'article',
+  PDF: 'pdf',
+  SLACK: 'slack',
+} as const;
+
+export const GIST_BASE_URL =
+  'https://gist.githubusercontent.com/JonaCodes/394d01021d1be03c9fe98cd9696f5cf3/raw';
+
+export const ARTICLE_IDS = [
+  'military-deployment-report',
+  'urban-commuting',
+  'hover-polo',
+  'warehousing',
+  'consumer-safety',
+] as const;
+
+export const PROCESSING_CONFIG = {
+  CHUNK_WORD_COUNT: 400,
+  HTTP_TIMEOUT: 10000,
+  RATE_LIMIT_DELAY: 100,
+} as const;
+
+export const PDF_FILES = [
+  'OpEd - A Revolution at Our Feet.pdf',
+  'Research Paper - Gravitational Reversal Physics.pdf',
+  'White Paper - The Development of Localized Gravity Reversal Technology.pdf',
+] as const;
 
 export const RAG_CONFIG = {
   // Number of similar chunks to retrieve

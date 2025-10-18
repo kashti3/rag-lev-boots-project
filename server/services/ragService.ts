@@ -1,5 +1,3 @@
-// Make sure you've reviewd the README.md file to understand the task and the RAG flow
-
 import { loadAllData as loadAllDataFromService, findSimilarChunks, formatChunksAsContext } from './dataService';
 import { createEmbedding, askGemini } from './llmService';
 import { LLM_CONFIG, RAG_CONFIG } from '../config/constants';
