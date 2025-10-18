@@ -1,29 +1,65 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {} from ""
-
+import { ragSearchTool, ragSearchSchema } from "./tools/rag_search";
+import { listKnowledgeSourcesTool, listKnowledgeSourcesSchema } from "./tools/list_knowledge_sources";
+import { readSourceTool, readSourceSchema } from "./tools/read_source";
 
 const mcpServer = new McpServer({
     name: "lev-boots-mcp-server",
     version: "1.0.0",
 });
 
-mcpServer.registerTool('rag_search', {
-    title: 'Show current currency',
-    description: 'Returns the current currency according to the user currency type request, otherwise show dollars',
-    inputSchema: {
-      fromCurrency: z.string(),
-      toCurrency: z.string()
+// Register rag_search tool
+mcpServer.registerTool(
+    ragSearchSchema.name,
+    {
+        description: ragSearchSchema.description,
+        inputSchema: ragSearchSchema.inputSchema
     },
-    annotations: {
-      readOnlyHint: true,
-      destructiveHint: false,
-      idempotentHint: true,
-      openWorldHint: true
+    async (params: any) => {
+        return {
+            content: [{
+                type: "text",
+                text: await ragSearchTool(params.question)
+            }]
+        };
     }
-  }, async ({ fromCurrency, toCurrency }) => {
-  
-  });
-  
-  const transport = new StdioServerTransport();
-  await mcpServer.connect(transport);
+);
+
+// Register list_knowledge_sources tool
+mcpServer.registerTool(
+    listKnowledgeSourcesSchema.name,
+    {
+        description: listKnowledgeSourcesSchema.description,
+        inputSchema: listKnowledgeSourcesSchema.inputSchema
+    },
+    async () => {
+        const result = await listKnowledgeSourcesTool();
+        return {
+            content: [{
+                type: "text",
+                text: JSON.stringify(result, null, 2)
+            }]
+        };
+    }
+);
+
+// Register read_source tool
+mcpServer.registerTool(
+    readSourceSchema.name,
+    {
+        description: readSourceSchema.description,
+        inputSchema: readSourceSchema.inputSchema
+    },
+    async (params: any) => {
+        return {
+            content: [{
+                type: "text",
+                text: await readSourceTool(params.sourceName, params.sourceType)
+            }]
+        };
+    }
+);
+
+const transport = new StdioServerTransport();
+await mcpServer.connect(transport);

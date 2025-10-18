@@ -91,3 +91,21 @@ export const fetchWebArticles = async (): Promise<WebArticleData[]> => {
   console.log(`Successfully fetched ${articles.length} out of ${ARTICLE_IDS.length} articles`);
   return articles;
 };
+
+export const readWebArticle = async (articleId: string): Promise<string> => {
+  // Find the article number based on the article ID
+  const articleIndex = ARTICLE_IDS.indexOf(articleId);
+  
+  if (articleIndex === -1) {
+    throw new Error(`Article ID '${articleId}' not found`);
+  }
+  
+  const articleNumber = articleIndex + 1;
+  const article = await fetchArticle(articleNumber, articleId);
+  
+  if (!article) {
+    throw new Error(`Failed to fetch article '${articleId}'`);
+  }
+  
+  return article.content;
+};

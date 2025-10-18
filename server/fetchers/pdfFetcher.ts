@@ -21,12 +21,10 @@ export const fetchPDFs = async (): Promise<PDFData[]> => {
     const pdfPromises = files
       .filter((file) => path.extname(file).toLowerCase() === '.pdf')
       .map(async (file) => {
-        const filePath = path.join(pdfsDirectory, file);
-        const dataBuffer = await fs.readFile(filePath);
-        const data = await pdf(dataBuffer);
+        const content = await readPDF(file);
         return {
           source: file,
-          content: data.text,
+          content: content,
         };
       });
       console.log("fetching pdfs data before promise")
@@ -35,4 +33,11 @@ export const fetchPDFs = async (): Promise<PDFData[]> => {
     console.error('Error fetching PDFs:', error);
     return [];
   }
+};
+
+export const readPDF = async (sourceName: string) => {
+  const filePath = path.join(pdfsDirectory, sourceName);
+  const dataBuffer = await fs.readFile(filePath);
+  const data = await pdf(dataBuffer);
+  return data.text;
 };
