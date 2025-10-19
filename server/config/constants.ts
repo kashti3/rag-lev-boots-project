@@ -2,7 +2,7 @@ export const GEMINI_MODEL = 'gemini-2.5-flash';
 
 export const LLM_CONFIG = {
   thinkingBudget: 0,
-  model: 'gemini-1.5-pro',
+  model: GEMINI_MODEL,
   embeddingModel: 'gemini-embedding-001',
   embeddingDimensions: 768
 };

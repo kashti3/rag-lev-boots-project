@@ -37,3 +37,8 @@ export const askQuestion = async (
     });
   }
 };
+
+
+export const healthCheck = async (_: Request, res: Response): Promise<void> => {
+  res.status(200).json({ ok: true, message: 'Server is healthy' });
+};

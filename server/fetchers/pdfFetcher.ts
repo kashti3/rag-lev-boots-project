@@ -1,7 +1,7 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { pdf } from 'pdf-parse';
+import { PDFParse } from 'pdf-parse';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -38,6 +38,9 @@ export const fetchPDFs = async (): Promise<PDFData[]> => {
 export const readPDF = async (sourceName: string) => {
   const filePath = path.join(pdfsDirectory, sourceName);
   const dataBuffer = await fs.readFile(filePath);
-  const data = await pdf(dataBuffer);
-  return data.text;
+  const pdfParser = new PDFParse({ data: dataBuffer });
+  const data = await pdfParser.getText();
+  const text = data.text;
+  await pdfParser.destroy();
+  return text;
 };
